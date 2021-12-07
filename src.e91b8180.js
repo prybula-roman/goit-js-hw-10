@@ -4735,7 +4735,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   }; // NOTIFLIX: Return: end
 });
 },{}],"H99C":[function(require,module,exports) {
-"use strict";
+"use strict"; //import { items, countryCard, soMarch ,banner} from "./fetchCountries";
 
 var _owntmpl = _interopRequireDefault(require("../template/owntmpl.hbs"));
 
@@ -4745,41 +4745,59 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var debounce = require("lodash.debounce");
 
-// import fetchCountries from "./fetchCountries";
-//console.log("Notiflix=", Notiflix);
 var inp = document.querySelector(".country");
-var setCountry = document.querySelector(".country");
 var list = document.querySelector(".list");
-setCountry.addEventListener("input", debounce(function (e) {
+
+function items(resp, targetTag) {
+  var result = resp.reduce(function (acc, elem) {
+    return acc += "<li class=\"item\"><img class=\"flag\"  src=\"".concat(elem.flags.svg, "\" > <p class=\"country-name\">").concat(elem.name, "</p></li>");
+  }, "");
+  targetTag.innerHTML = result;
+}
+
+function countryCard(resp, targetTag, templ) {
+  //list.innerHTML = template(resp);
+  templ = templ(resp);
+  list.innerHTML = templ;
+  var langs = document.querySelector(".langs"); //Избавляемся от последней запятой
+
+  var str = langs.lastChild.previousSibling.innerText;
+  var lastChar = str.indexOf(",");
+  langs.lastChild.previousSibling.innerText = str.substring(0, lastChar);
+}
+
+var banner = function banner() {
+  _notiflix.default.Notify.info("Too many matches found. Please enter a more specific name.");
+};
+
+function soMarch(targetTag, banner) {
+  banner();
+  targetTag.innerHTML = "";
+  return;
+}
+
+inp.addEventListener("input", debounce(function (e) {
   fetch("https://restcountries.com/v2/name/".concat(e.target.value.trim())).then(function (response) {
     return response.json();
   }).then(function (resp) {
-    if (resp.status) {
+    if (resp.status === 404) {
       _notiflix.default.Notify.failure("Oops, there is no country with that name");
+
+      return;
     }
 
     if (resp.length > 10) {
-      _notiflix.default.Notify.info("Too many matches found. Please enter a more specific name.");
-
-      list.innerHTML = "";
-      return;
+      soMarch(list, banner);
     } else if (resp.length >= 2 && resp.length <= 10) {
-      var items = resp.reduce(function (acc, elem) {
-        return acc += "<li class=\"item\"><img class=\"flag\"  src=\"".concat(elem.flags.svg, "\" > <p class=\"country-name\">").concat(elem.name, "</p></li>");
-      }, "");
-      list.innerHTML = items;
+      items(resp, list);
     } else if (resp.length === 1) {
-      var inputCountry = document.querySelector(".country");
-      list.innerHTML = (0, _owntmpl.default)(resp);
-      var langs = document.querySelector(".langs"); //Избавляемся от последней запятой
-
-      var str = langs.lastChild.previousSibling.innerText;
-      var lastChar = str.indexOf(",");
-      langs.lastChild.previousSibling.innerText = str.substring(0, lastChar);
+      countryCard(resp, list, _owntmpl.default);
     }
-  }).catch(function (error) {
+  }).catch(function (rejec) {
+    console.log(reject);
+
     _notiflix.default.Notify.failure("Ooooops!!!!!");
   });
 }, 500));
 },{"lodash.debounce":"TZhv","../template/owntmpl.hbs":"bkJD","./notiflix":"vsWf"}]},{},["H99C"], null)
-//# sourceMappingURL=/goit-js-hw-10/src.ef9bd2eb.js.map
+//# sourceMappingURL=/goit-js-hw-10/src.e91b8180.js.map
