@@ -1,3 +1,5 @@
+"use strict";
+
 const debounce = require("lodash.debounce");
 import template from "../template/owntmpl.hbs";
 
